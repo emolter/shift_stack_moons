@@ -3,13 +3,14 @@ find small moons around planets using shift-and-stack based on JPL Horizons ephe
 
 will also auto-rotate back to N-up E-left if the telescope rotator had nonzero angle.
 
+![alt text](https://github.com/emolter/shift_stack_moons/blob/main/despina_pretty_picture.jpeg?raw=true)
+
+This image shows the utility of the software. The input frames have been shifted to stack on top of Despina, so all the labeled moonlets except Despina appear as streaks. If you look closely you can see the individual images that make up Proteus's streak. Neptune is a streak, too, but it's so overexposed you can't tell. The sidelobes of the PSF can be seen on Despina. We compared this stacked PSF to a calibration star PSF and the match is pretty close, so the shift-and-stack is quite accurate.
+
 # usage
 1. Open shift_and_stack.py in a text editor
 2. Change the user inputs starting on Line 34
 3. From terminal, run ./shift_and_stack.py
-
-# despina_pretty_picture.jpeg
-This image shows the utility of the software. The input frames have been shifted to stack on top of Despina, so all the labeled moonlets except Despina appear as streaks. If you look closely you can see the individual images that make up Proteus's streak. Neptune is a streak, too, but it's so overexposed you can't tell. The sidelobes of the PSF can be seen on Despina. We compared this stacked PSF to a calibration star PSF and the match is pretty close, so the shift-and-stack is quite accurate.
 
 # caveats
 this has only been tested on a single Neptune dataset (30 images over about an hour) observed with the NIRC2 narrow camera. Your mileage may vary.
