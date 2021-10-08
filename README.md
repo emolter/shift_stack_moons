@@ -1,5 +1,5 @@
 # description
-find small moons around planets using shift-and-stack based on JPL Horizons ephemeris.
+find small moons around planets using shift-and-stack based on JPL Horizons ephemeris, save as fits
 
 will also auto-rotate back to N-up E-left if the telescope rotator had nonzero angle.
 
