@@ -26,4 +26,4 @@ all other dependencies should be included with a usual Python Anaconda release
 # cite
 if you use this for research, please cite it in some way.  I'm no expert on how to do this right, but there are plenty of resources, e.g.: https://journals.aas.org/news/software-citation-suggestions/
 
-written by Ned Molter 2021-Oct-08. email me: emolter at berkeley.edu
+written by Ned Molter 2021-Oct-08.
