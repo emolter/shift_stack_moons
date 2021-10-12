@@ -15,7 +15,7 @@ This image shows the utility of the software. Thirty images of Neptune from Keck
 # caveats
 this has only been tested on a single Neptune dataset observed with the NIRC2 narrow camera. Your mileage may vary.
 
-shift_and_stack.py scrapes the FITS header of input images for the following keywords: ROTPOSN, DATE-OBS, EXPSTART, NAXIS1, NAXIS2
+shift_and_stack.py scrapes the FITS header of input images for the following keywords: ROTPOSN, DATE-OBS, EXPSTART, NAXIS1, NAXIS2, ITIME, COADDS
 if you are using any instrument other than Keck NIRC2, you may need to replace these hard-coded keywords 
 
 # dependencies
