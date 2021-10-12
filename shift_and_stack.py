@@ -31,8 +31,7 @@ def chisq_stack(frames):
 if __name__ == "__main__":
 
     # user inputs
-    moon = 'Despina' # must be lookup-able by JPL naif lookup
-    load_result = True      
+    moon = 'Despina' # must be lookup-able by JPL naif lookup     
     obs_code = 568 # maunakea. JPL observatory code
     pixscale = 0.009942 #arcsec per pixel for NIRC2 narrow camera
     tstart = '2021-10-07 00:00' # these only need to be approximate, but tstart should be before first input frame and tend should be after last frame
@@ -63,6 +62,7 @@ if __name__ == "__main__":
     shifted_images = []
     shifted_x = []
     shifted_y = []
+    total_itime_seconds = 0
     for i in range(len(filenames)):
         
         print('Processing file %i out of %i'%(i+1, len(filenames)))
@@ -74,9 +74,6 @@ if __name__ == "__main__":
         angle_needed = -float(Image(filename).header['ROTPOSN'])
         if np.abs(angle_needed) > 0.0:
             frame = ndimage.rotate(frame, angle_needed)
-        
-        #plt.imshow(frame, origin = 'lower')
-        #plt.show()
         
         # match ephemeris time with time in fits header
         obsdate = hdr['DATE-OBS'].strip(', \n')
@@ -94,11 +91,12 @@ if __name__ == "__main__":
         
         # do the shift
         shifted = shift2d(frame,dx,-dy)
-        
-        #plt.imshow(shifted, origin = 'lower')
-        #plt.show()
-        
         shifted_images.append(shifted)
+        
+        # add to total exposure time
+        itime = hdr['ITIME'] * hdr['COADDS']
+        total_itime_seconds += itime
+        
         
     shifted_images = np.asarray(shifted_images)
     stacked_image = np.sum(shifted_images, axis = 0)
@@ -108,6 +106,8 @@ if __name__ == "__main__":
     fits_out.data = stacked_image
     fits_out.header['NAXIS1'] = stacked_image.shape[0]
     fits_out.header['NAXIS2'] = stacked_image.shape[1]
+    fits_out.header['ITIME'] = total_itime_seconds
+    fits_out.header['COADDS'] = 1
     fits_out.write(outfile)
 
     #plt.plot(shifted_x, shifted_y, linestyle = '', marker = '.')
