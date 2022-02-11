@@ -16,7 +16,7 @@ shift and stack according to a moon ephemeris
 
 def chisq_stack(frames):
     '''Cross-correlate the images applying sub-pixel shift.
-    Shift found using DFT upsampling method as written by 
+    Shift found using DFT upsampling method as written by image_registration package
     Stack them on top of each other to increase SNR.'''
     shifted_data = [frames[0]]
     for frame in frames[1:]:
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     tend = '2021-10-07 23:59'
     filestem = '/Users/emolter/research/keck/observations/nirc2/reduced/2021oct07/'
     filenames = [filestem + 'frame%i_nophot_h.fits'%i for i in range(30)]
-    outfile = 'data/shifted_stacked_%s.fits'%moon.lower()
+    outfile = '/Users/emolter/research/keck/analysis/shift_and_stack/data/shifted_stacked_%s.fits'%moon.lower()
     
     # get ephemeris from Horizons. quantity 6 is the satellite relative position to parent in arcsec
     code = get_ephem.naif_lookup(moon)
