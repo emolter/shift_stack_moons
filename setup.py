@@ -34,7 +34,7 @@ setup(
         python_requires='>=3',
         license="BSD",
         keywords='planetary astronomy moons jpl ephemeris',
-        packages=['shift_stack_moons', 'shift_stack_moons.tests'],
+        packages=[],
         platforms=['any'],
         setup_requires=['pytest-runner'],
         tests_require=['pytest']
