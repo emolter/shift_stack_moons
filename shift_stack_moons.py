@@ -1,17 +1,10 @@
 #!/usr/bin/env python
 
 '''
-
-
 example call:
-python shift_and_stack.py images_list.txt "Despina" "568" "2021-10-07 00:00" "2021-10-07 23:59" 0.009942
+python shift_stack_moons.py sample_images_list.txt "Despina" "568" "2021-10-07 00:00" "2021-10-07 23:59" 0.009942
 
 make filename list with, e.g., ls frame*.fits > images_list.txt
-
-filestem = '/Users/emolter/research/keck/observations/nirc2/reduced/2021oct07/'
-filenames = [filestem + 'frame%i_nophot_h.fits'%i for i in range(30)]
-outfile = '/Users/emolter/research/keck/analysis/shift_and_stack/data/shifted_stacked_%s.fits'%moon.lower()
-
 '''
 
 import numpy as np
@@ -30,12 +23,16 @@ import warnings
 def parse_arguments(args):
 
     parser = argparse.ArgumentParser(
-        description="Shift and stack observation frames according to a moon ephemeris"
+        description="""
+        Shift and stack observation frames according to a moon ephemeris.
+        example call:
+            python shift_stack_moons.py sample_images_list.txt "Despina" "568" "2021-10-07 00:00" "2021-10-07 23:59" 0.009942
+        """
     )
     parser.add_argument(
         "fname_list",
         type=argparse.FileType('r'),
-        help='text file with one input fits filename per line. requires full path to each file',
+        help='text file with one input fits filename per line. requires full path to each file. can be made with, e.g., ls frame*.fits > images_list.txt',
     )
     parser.add_argument(
         "code", nargs="?", help='JPL Horizons target name or NAIF ID, e.g. "Despina"'

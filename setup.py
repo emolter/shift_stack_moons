@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 import sys
-from setuptools import setup
+from setuptools import setup, find_packages
 
-VERSION = '0.0.1'
+VERSION = '0.0.5'
 DESCRIPTION = "Find small moons around planets using shift-and-stack based on JPL Horizons ephemeris"
 
 CLASSIFIERS = list(filter(None, map(str.strip,
@@ -34,7 +34,8 @@ setup(
         python_requires='>=3',
         license="BSD",
         keywords='planetary astronomy moons jpl ephemeris',
-        packages=[],
+        packages=find_packages(),
+        py_modules=['shift_stack_moons', 'image'],
         platforms=['any'],
         setup_requires=['pytest-runner'],
         tests_require=['pytest']
