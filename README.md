@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/415108491.svg)](https://zenodo.org/badge/latestdoi/415108491)
+
 # installation
 
 Use `pip install shift_stack_moons` to install. Should work on Python>=3.5
