@@ -1,11 +1,11 @@
 # installation
 
-Use `pip install shift_stack_moons` to install. Should work on Python>=3.5
+Use `pip install shift_stack_moons` to install. Tested in Python 3.9 but might work on other versions.
 
 # description
 find small moons around planets using shift-and-stack based on JPL Horizons ephemeris, save as fits
 
-will also auto-rotate back to N-up E-left if the telescope rotator had nonzero angle.
+At present, Keck NIRC2 fits header keywords are hard-coded in. 
 
 ![alt text](https://github.com/emolter/shift_stack_moons/blob/main/despina_pretty_picture.jpeg?raw=true)
 
@@ -14,14 +14,15 @@ This image shows the utility of the software. Thirty images of Neptune from Keck
 # usage
 command-line application: "python shift_and_stack.py -h" for help
 
-# caveats
-this has only been tested on a single Neptune dataset observed with the NIRC2 narrow camera. Your mileage may vary.
+as a Python import: the preferred method. see the docstring of shift\_stack\_moons
 
+# caveats
 shift_and_stack.py scrapes the FITS header of input images for the following keywords: ROTPOSN, DATE-OBS, EXPSTART, NAXIS1, NAXIS2, ITIME, COADDS
-if you are using any instrument other than Keck NIRC2, you will likely need to replace these hard-coded keywords 
+if you are using any instrument other than Keck NIRC2, you will likely need to replace these hard-coded keywords.
+I plan to make this more generic eventually, but I'm paid to do science, not code. If you want to help out, make a pull request!
 
 # dependencies
-requires the Astropy-affiliated package image_registration: https://pypi.org/project/image_registration/
+requires the Astropy-affiliated package image\_registration: https://pypi.org/project/image_registration/
 
 all other dependencies should be included with a usual Python Anaconda release
 

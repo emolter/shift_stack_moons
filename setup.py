@@ -3,7 +3,7 @@
 import sys
 from setuptools import setup, find_packages
 
-VERSION = '0.0.5'
+VERSION = '0.0.6'
 DESCRIPTION = "Find small moons around planets using shift-and-stack based on JPL Horizons ephemeris"
 
 CLASSIFIERS = list(filter(None, map(str.strip,
