@@ -1,5 +1,4 @@
-.. image:: https://zenodo.org/badge/415108491.svg
-   :target: https://zenodo.org/badge/latestdoi/415108491
+[![DOI](https://zenodo.org/badge/415108491.svg)](https://zenodo.org/badge/latestdoi/415108491)
 
 # installation
 
