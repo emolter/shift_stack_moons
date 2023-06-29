@@ -77,7 +77,9 @@ def parse_arguments(args):
 def chisq_stack(frames, showplot = False, edge_detect=True, **kwargs):
     """Cross-correlate the images applying sub-pixel shift.
     Shift found using DFT upsampling method as written by image_registration package
-    Stack them on top of each other to increase SNR."""
+    Stack them on top of each other to increase SNR.
+    
+    kwargs: see edge detect kwargs"""
     defaultKwargs={'sigma':5,
                     'low_thresh':1e-1,
                     'high_thresh':1e1}
@@ -106,7 +108,7 @@ def chisq_stack(frames, showplot = False, edge_detect=True, **kwargs):
     return shifted_data
 
 
-def shift_and_stack(fname_list, ephem, pixscale=0.009971, rotation_correction = 0.262, difference=False, edge_detect=False, perturbation_mode=False, diagnostic_plots = False):
+def shift_and_stack(fname_list, ephem, pixscale=0.009971, rotation_correction = 0.262, difference=False, edge_detect=False, perturbation_mode=False, diagnostic_plots = False, **kwargs):
     """
     Description
     -----------
@@ -140,28 +142,37 @@ def shift_and_stack(fname_list, ephem, pixscale=0.009971, rotation_correction = 
     frames = [Image(fname).data for fname in fname_list]
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        frames_centered = chisq_stack(frames, edge_detect=edge_detect, showplot = diagnostic_plots)
-    if difference:
-        # find the median frame after shifting, from which we can difference the others
-        frames_centered = np.array(frames_centered)
-        median_frame = np.median(frames_centered, axis=0)
-        if diagnostic_plots:
-            plt.imshow(median_frame, origin='lower', vmax=100)
-            plt.show()
+        frames_centered = chisq_stack(frames, edge_detect=edge_detect, showplot = diagnostic_plots, **kwargs)
+    
+    median_frame = np.median(frames_centered, axis=0)
+    if diagnostic_plots:
+        plt.imshow(median_frame, origin='lower')
+        plt.show()
 
     # plt.plot(x_shifts, y_shifts, linestyle = '', marker = '.')
     # plt.show()
+    
+    # ensure ephem is a pandas object with proper index
+    ephem = ephem.to_pandas()
+    ephem = ephem.set_index(pd.DatetimeIndex(ephem["datetime_str"]))
     
     # make an interpolation function for x,y position as f(time) from ephem
     x_shifts = ephem["sat_X"].to_numpy()
     y_shifts = ephem["sat_Y"].to_numpy()
     datetimes = pd.DatetimeIndex(ephem["datetime_str"])
-    ephem_start_time = datetimes[0]
+    ephem_start_time = min(datetimes)
     dt = (datetimes - ephem_start_time).total_seconds().to_numpy()
     x_interp = interpolate.interp1d(dt, x_shifts)
     y_interp = interpolate.interp1d(dt, y_shifts)
     #test_time = (pd.to_datetime('2019-10-28 01:00:04', format="%Y-%m-%d %H:%M:%S") - ephem_start_time).total_seconds()
     #print(x_interp(test_time))
+    
+    if diagnostic_plots:
+        plt.plot(x_shifts, y_shifts)
+        plt.xlabel('X position')
+        plt.ylabel('Y position')
+        plt.title('Object track, sky N up')
+        plt.show()
 
     # loop through all the input images and perform shift and stack
     shifted_images = []
@@ -176,22 +187,18 @@ def shift_and_stack(fname_list, ephem, pixscale=0.009971, rotation_correction = 
         hdr = Image(filename).header
         
         # do the differencing if difference=True
-        if difference==True:
-            scaling = False #remove this option later.
-            if scaling:
-                flux_scaling = np.mean(median_frame) / np.mean(frame)
-                frame = (flux_scaling*frame) - median_frame
-            else:
-                frame = frame - median_frame
+        if difference:
+            frame = frame - median_frame
 
         # rotate frame to posang 0, in case was rotated before
         # rotation correction is defined clockwise, but ndimage.rotate rotates ccw
-        angle_needed = -rotation_correction-(float(Image(filename).header["ROTPOSN"]) - float(Image(filename).header["INSTANGL"]))
+        angle_needed = -rotation_correction - (float(Image(filename).header["ROTPOSN"]) - float(Image(filename).header["INSTANGL"]))
         frame = ndimage.rotate(frame, angle_needed)
 
         # match ephemeris time with midpoint time in fits header
         obsdate = hdr["DATE-OBS"].strip(", \n")
         start_time = obsdate + " " + hdr["EXPSTART"][:8] #accuracy seconds
+        print(start_time)
         start_nseconds = (pd.to_datetime(start_time, format="%Y-%m-%d %H:%M:%S") - ephem_start_time).total_seconds()
         middle_nseconds = start_nseconds + 0.5*float(hdr["ITIME"])*float(hdr["COADDS"])
         x_shift = x_interp(middle_nseconds)

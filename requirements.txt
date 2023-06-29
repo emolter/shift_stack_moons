@@ -1,8 +1,10 @@
-astropy
-astroquery
-image_registration
-matplotlib
-numpy
-pandas
-scipy
-setuptools
+pip install numpy
+pip install matplotlib
+pip install pandas
+pip install scipy
+pip install astropy
+pip install astroquery
+pip install scikit-image
+pip install pytest
+pip install git+https://github.com/keflavich/image_registration.git
+pip install shift_stack_moons
