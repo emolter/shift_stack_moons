@@ -1,85 +1,49 @@
 #!/usr/bin/env python
 
-"""
-example call:
-python shift_stack_moons.py sample_images_list.txt "Despina" "568" "2021-10-07 00:00" "2021-10-07 23:59" 0.009942
-
-make filename list with, e.g., ls frame*.fits > images_list.txt
-"""
-
 import matplotlib.pyplot as plt
 import numpy as np
 from image_registration.chi2_shifts import chi2_shift
 from image_registration.fft_tools.shift import shift2d
-from image import Image
+from astropy.io import fits
 from astroquery.jplhorizons import Horizons
 from scipy import ndimage, interpolate
 import sys
 from datetime import datetime
-import argparse
 import pandas as pd
 import warnings
 from skimage import feature
-
-
-def parse_arguments(args):
-
-    parser = argparse.ArgumentParser(
-        description="""
-        Shift and stack observation frames according to a moon ephemeris.
-        example call:
-            python shift_stack_moons.py sample_images_list.txt "Despina" "568" "2021-10-07 00:00" "2021-10-07 23:59" 0.009942
-        """
-    )
-    parser.add_argument(
-        "fname_list",
-        type=argparse.FileType("r"),
-        help="text file with one input fits filename per line. requires full path to each file. can be made with, e.g., ls frame*.fits > images_list.txt",
-    )
-    parser.add_argument(
-        "code", nargs="?", help='JPL Horizons target name or NAIF ID, e.g. "Despina"'
-    )
-    parser.add_argument(
-        "obscode",
-        nargs="?",
-        help='JPL Horizons observatory code, e.g. "568" for Maunakea',
-    )
-    parser.add_argument(
-        "tstart",
-        nargs="?",
-        help='Observation start time in format "YYYY-MM-DD HH:MM"". Needs not be exact as long as it is before first image was taken',
-    )
-    parser.add_argument(
-        "tend",
-        nargs="?",
-        default=None,
-        const=None,
-        help='Observation end time in format "YYYY-MM-DD HH:MM"". Needs not be exact as long as it is after last image was taken',
-    )
-    parser.add_argument(
-        "pixscale",
-        nargs="?",
-        default=0.009942,
-        const=None,
-        help="Pixel scale of the images in arcseconds. Default is 0.009942 for NIRC2 narrow camera",
-    )
-    parser.add_argument("--version", action="version", version="0.0.1")
-
-    args = parser.parse_args(args)
-    args.fname_list = list(args.fname_list.readlines())
-    args.fname_list = [s.strip(", \n") for s in args.fname_list]
-
-    args.pixscale = float(args.pixscale)
-
-    return args
+import importlib, importlib.resources
+import yaml
+import shift_stack_moons.data as header_info
 
 
 def chisq_stack(frames, showplot = False, edge_detect=True, **kwargs):
-    """Cross-correlate the images applying sub-pixel shift.
+    """
+    Description
+    -----------
+    Cross-correlate input images applying sub-pixel shift.
     Shift found using DFT upsampling method as written by image_registration package
     Stack them on top of each other to increase SNR.
     
-    kwargs: see edge detect kwargs"""
+    Parameters
+    ----------
+    frames: list, required.
+        list of 2-D image arrays.
+    showplot: bool, optional. default False.
+        if True, shows diagnostic plot for Canny edge detector
+    edge_detect: bool, optional. default True
+        if True, applies the cross-correlation on image edges. This can be advantageous
+            for images of e.g. Neptune, which has bright cloud features that may move
+            across the frame, so it's better to cross-correlate on the edge of the planet's
+            disk
+        if False, applies a simple cross-correlation to the image itself
+    kwargs: 
+        see kwargs of skimage.feature.canny
+    
+    Returns
+    -------
+    shifted_data: np.array
+    """
     defaultKwargs={'sigma':5,
                     'low_thresh':1e-1,
                     'high_thresh':1e1}
@@ -108,40 +72,83 @@ def chisq_stack(frames, showplot = False, edge_detect=True, **kwargs):
     return shifted_data
 
 
-def shift_and_stack(fname_list, ephem, pixscale=0.009971, rotation_correction = 0.262, difference=False, edge_detect=False, perturbation_mode=False, diagnostic_plots = False, **kwargs):
+def load_header_kw_dict(instrument):
+    '''
+    Description
+    -----------
+    Load dictionary that translates header keywords for a given telescope
+    see kw_nirc2.yaml for an example
+    
+    Parameters
+    ----------
+    instrument: str, required.
+        telescope/instrument used. code will assume there exists a .yaml file 
+        named kw_instrument.yaml in the data/ subdirectory
+    '''
+    fname = f'kw_{instrument}.yaml'
+    with importlib.resources.open_binary(header_info, fname) as file:
+        yaml_bytes = file.read()
+        header_kw_dict = yaml.safe_load(yaml_bytes)
+    
+    return header_kw_dict
+    
+
+def shift_and_stack(fname_list, ephem, instrument='nirc2', difference=False, edge_detect=False, perturbation_mode=False, diagnostic_plots = False, **kwargs):
     """
     Description
     -----------
     See Molter et al. (2023), doi:whatever Appendix whatever
+    Stack will be applied at the location of the zeroth image in fname_list
     
     Parameters
     ----------
-    fname_list: list of Keck fits image filenames. if not time-sorted this will
-        still work, but some header info might be incorrect
-        header info is taken from the zeroth fname in the list
-    ephem: pd dataframe, required. astroquery Horizons ephemeris. must contain at least quantity 6, 
+    fname_list: list, required.
+        list of fits image filenames. images are assumed to be in hdulist[0].data
+        if not time-sorted, some header info might be incorrect
+    ephem: pd dataframe, required. 
+        astroquery Horizons ephemeris. must contain at least quantity 6, 
         the x,y position of the satellite relative to the planet
-    pixscale: float, optional. pixel scale of the detector, default 0.009971 (Keck post-2015)
-    rotation_correction: float, optional. 
-        number of degrees to rotate clockwise to get North up, default 0.262 (Keck post-2015)
-    difference: bool, optional. default False. Do you want to compute a median average, 
+    instrument: str, optional. default "nirc2"
+        header keyword .yaml file to load.
+        assumes filename kw_instrument.yaml
+        see kw_nirc2.yaml for an example
+    difference: bool, optional. default False. 
+        Do you want to compute a median average, 
         then difference each frame according to that median average?
-    edge_detect: bool, optional. default False. If True, align the frames using a Canny
+    edge_detect: bool, optional. default False. 
+        If True, align the frames using a Canny
         edge detection technique. If False, use a chi-square minimization of cross correlation
-    perturbation_mode: bool, optional. If True, add random x,y shifts on top of 
+    perturbation_mode: bool, optional. Default False.
+        If True, add random x,y shifts on top of 
         the true x,y shifts to show that this does NOT lead to a detection, i.e.,
         that the shift-and-stack technique does not introduce spurious detections
-    diagnostic_plots: bool, optional. If True, shows median frame after image registration
+    diagnostic_plots: bool, optional. Default False.
+        If True, shows median frame after image registration
         but before applying moon shift, and if edge_detect is also True, shows the edge detection solution
     
-    To do
+    Returns
+    -------
+    fits_out: astropy.fits object
+        header info is copied from the first input image, with the following exceptions:
+            ITIME: total integration time, computed as the sume of itime*coadds
+    
+    Notes
     -----
-    presently, this only works on Keck NIRC2 images. make header keyword dictionary possible
+    Rotation Angle
+        The image is rotated counterclockwise according to:
+            angle_needed = -rotation_correction - (rotator_angle - instrument_angle)
+        This definition follows the convention for Keck NIRC2.
+            see https://github.com/jluastro/nirc2_distortion/wiki
     """
+    
+    # load the header keyword dictionary
+    kw_inst = load_header_kw_dict(instrument)
+    pixscale = kw_inst['pixscale']
+    rotation_correction = kw_inst['rotation_correction']
 
-    frames = [Image(fname).data for fname in fname_list]
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
+        frames = [fits.open(fname, ignore_missing_end=True)[0].data for fname in fname_list]
         frames_centered = chisq_stack(frames, edge_detect=edge_detect, showplot = diagnostic_plots, **kwargs)
     
     median_frame = np.median(frames_centered, axis=0)
@@ -184,7 +191,7 @@ def shift_and_stack(fname_list, ephem, pixscale=0.009971, rotation_correction = 
         print("Processing file %i out of %i" % (i + 1, len(frames_centered)))
         filename = fname_list[i]
         frame = frames_centered[i]
-        hdr = Image(filename).header
+        hdr = fits.open(filename, ignore_missing_end=True)[0].header
         
         # do the differencing if difference=True
         if difference:
@@ -192,15 +199,15 @@ def shift_and_stack(fname_list, ephem, pixscale=0.009971, rotation_correction = 
 
         # rotate frame to posang 0, in case was rotated before
         # rotation correction is defined clockwise, but ndimage.rotate rotates ccw
-        angle_needed = -rotation_correction - (float(Image(filename).header["ROTPOSN"]) - float(Image(filename).header["INSTANGL"]))
+        angle_needed = -rotation_correction - \
+                    (float(hdr[kw_inst["rotator_angle"]]) - float(hdr[kw_inst["instrument_angle"]]))
         frame = ndimage.rotate(frame, angle_needed)
 
         # match ephemeris time with midpoint time in fits header
-        obsdate = hdr["DATE-OBS"].strip(", \n")
-        start_time = obsdate + " " + hdr["EXPSTART"][:8] #accuracy seconds
-        print(start_time)
+        obsdate = hdr[kw_inst["obsdate"]].strip(", \n")
+        start_time = obsdate + " " + hdr[kw_inst["start_time"]][:8] #accuracy seconds
         start_nseconds = (pd.to_datetime(start_time, format="%Y-%m-%d %H:%M:%S") - ephem_start_time).total_seconds()
-        middle_nseconds = start_nseconds + 0.5*float(hdr["ITIME"])*float(hdr["COADDS"])
+        middle_nseconds = start_nseconds + 0.5*float(hdr[kw_inst["itime"]])*float(hdr[kw_inst["coadds"]])
         x_shift = x_interp(middle_nseconds)
         y_shift = y_interp(middle_nseconds)
 
@@ -231,38 +238,19 @@ def shift_and_stack(fname_list, ephem, pixscale=0.009971, rotation_correction = 
         shifted_images.append(shifted)
 
         # add to total exposure time
-        itime = hdr["ITIME"] * hdr["COADDS"]
+        itime = hdr[kw_inst["itime"]] * hdr[kw_inst["coadds"]]
         total_itime_seconds += itime
 
     shifted_images = np.asarray(shifted_images)
     stacked_image = np.sum(shifted_images, axis=0)
 
     # save the stacked image as .fits
-    fits_out = Image(fname_list[0])  # steal most of the header info from the first input image
-    fits_out.data = stacked_image
-    fits_out.header["NAXIS1"] = stacked_image.shape[0]
-    fits_out.header["NAXIS2"] = stacked_image.shape[1]
-    fits_out.header["ITIME"] = total_itime_seconds
-    fits_out.header["COADDS"] = 1
-    fits_out.header["EXPSTOP"] = hdr["EXPSTOP"] #this comes from the last input image
+    fits_out = fits.open(fname_list[0], ignore_missing_end=True)  # steal most of the header info from the first input image
+    fits_out[0].data = stacked_image
+    fits_out[0].header["NAXIS1"] = stacked_image.shape[0]
+    fits_out[0].header["NAXIS2"] = stacked_image.shape[1]
+    fits_out[0].header["ITIME"] = total_itime_seconds
+    fits_out[0].header["COADDS"] = 1
+    fits_out[0].header["EXPSTOP"] = hdr[kw_inst["end_time"]] #this comes from the last input image
 
     return fits_out
-
-
-if __name__ == "__main__":
-
-    args = parse_arguments(sys.argv[1:])
-
-    ## get ephemeris from Horizons. quantity 6 is the satellite relative position to parent in arcsec
-    horizons_obj = Horizons(
-        id=args.code,
-        location=args.obscode,
-        epochs={"start": args.tstart, "stop": args.tend, "step": "1m"},
-    )
-    ephem = horizons_obj.ephemerides(quantities=6).to_pandas()
-    ephem = ephem.set_index(pd.DatetimeIndex(ephem["datetime_str"]))
-
-    # do shift-and-stack and write
-    fits_out = shift_and_stack(args.fname_list, ephem, pixscale=args.pixscale)
-    outfname = "shifted_stacked_%s.fits" % (args.code)
-    fits_out.write(outfname)

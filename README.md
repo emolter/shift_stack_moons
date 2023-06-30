@@ -22,7 +22,9 @@ This image shows the utility of the software. Thirty images of Neptune from Keck
 
 # caveats
 shift_and_stack.py scrapes the FITS header of input images for the following keywords: ROTPOSN, DATE-OBS, EXPSTART, NAXIS1, NAXIS2, ITIME, COADDS
+
 if you are using any instrument other than Keck NIRC2, you will likely need to replace these hard-coded keywords.
+
 I plan to make this more generic eventually, but I'm paid to do science, not code. If you want to help out, make a pull request!
 
 # dependencies

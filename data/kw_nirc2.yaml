@@ -1,0 +1,11 @@
+pixscale: 0.009971
+rotation_correction: 0.262
+obsdate: "DATE-OBS"
+start_time: "EXPSTART"
+rotator_angle: "ROTPOSN"
+instrument_angle: "INSTANGL"
+itime: "ITIME"
+coadds: "COADDS"
+naxis1: "NAXIS1"
+naxis2: "NAXIS2"
+end_time: "EXPSTOP"
