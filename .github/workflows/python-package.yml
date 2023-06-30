@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
 
     steps:
     - uses: actions/checkout@v3
@@ -38,3 +38,8 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
+    - name: Upload coverage to codecov
+      if: contains(matrix.toxenv,'-cov')
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
