@@ -15,7 +15,7 @@ import shift_stack_moons.data as header_info
 
 def chisq_stack(frames, showplot=False, edge_detect=True, **kwargs):
     """
-    Description
+    Description  
     -----------
     Cross-correlate input images applying sub-pixel shift.
     Shift found using DFT upsampling method
