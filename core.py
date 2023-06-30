@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import matplotlib.pyplot as plt
 import numpy as np
 from image_registration.chi2_shifts import chi2_shift

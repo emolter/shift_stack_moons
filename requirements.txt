@@ -1,6 +1,7 @@
 numpy
 matplotlib
 pandas
+pytest
 scipy
 astropy
 astroquery
