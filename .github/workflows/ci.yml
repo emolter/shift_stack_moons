@@ -55,8 +55,6 @@ jobs:
     - name: Test with tox
       run: |
         tox ${{ matrix.toxargs }} -e ${{ matrix.toxenv }} -- ${{ matrix.toxposargs }}
-    - name: Upload coverage to codecov
-      if: contains(matrix.toxenv,'-cov')
+    - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
-      with:
-        file: ./coverage.xml
+        env: CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
