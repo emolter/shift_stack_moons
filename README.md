@@ -1,5 +1,9 @@
 [![DOI](https://zenodo.org/badge/415108491.svg)](https://zenodo.org/badge/latestdoi/415108491)
 
+.. image:: https://codecov.io/gh/emolter/shift_stack_moons/branch/main/graph/badge.svg
+    :target: https://codecov.io/gh/emolter/shift_stack_moons
+    :alt: Coverage results
+
 # installation
 
 1. Ensure Python version in your environment is >=3.7
