@@ -35,6 +35,8 @@ def test_shift_and_stack(datadir):
             f'urh12{str(stem)}.fits') for stem in instems]
     fname_list = np.sort(fname_list)
     ephem = ascii.read(os.path.join(datadir, 'ephem.txt'))
+    
+    # test simple cross-correlation
     fits_out = shift_and_stack(
         fname_list,
         ephem,
@@ -48,3 +50,14 @@ def test_shift_and_stack(datadir):
         assert fits_out[0].header[key] == truth[0].header[key]
 
     assert np.allclose(fits_out[0].data, truth[0].data, rtol=1e-3)
+    
+    # test edge detect
+    fits_out_ed = shift_and_stack(
+        fname_list,
+        ephem,
+        difference=False,
+        edge_detect=True,
+        diagnostic_plots=False)
+        
+    truth_ed = fits.open(os.path.join(datadir, 'urh12_Puck_2019-11-04_ed.fits'))
+    assert np.allclose(fits_out_ed[0].data, truth_ed[0].data, rtol=1e-3)

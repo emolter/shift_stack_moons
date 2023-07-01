@@ -6,6 +6,5 @@ scipy
 astropy
 astroquery
 scikit-image
-pytest
 pyyaml
 git+https://github.com/keflavich/image_registration.git
