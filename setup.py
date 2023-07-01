@@ -2,7 +2,7 @@
 
 from setuptools import setup, find_packages
 
-VERSION = '0.0.6'
+VERSION = '0.0.7'
 DESCRIPTION = "Find small moons around planets \
     using shift-and-stack based on JPL Horizons ephemeris"
 
@@ -12,12 +12,12 @@ Development Status :: 3 - Alpha
 Intended Audience :: Science/Research
 License :: OSI Approved :: BSD License
 Programming Language :: Python
-Programming Language :: Python :: 3.5
 Programming Language :: Python :: 3.6
 Programming Language :: Python :: 3.7
 Programming Language :: Python :: 3.8
 Programming Language :: Python :: 3.9
-Programming Language :: Python :: Implementation :: CPython
+Programming Language :: Python :: 3.10
+Programming Language :: Python :: 3.11
 Topic :: Software Development :: Libraries :: Python Modules
 """.splitlines())))
 
@@ -35,7 +35,7 @@ setup(
     license="BSD",
     keywords='planetary astronomy moons jpl ephemeris',
     packages=find_packages(),
-    py_modules=['shift_stack_moons', 'image'],
+    py_modules=['shift_stack_moons'],
     platforms=['any'],
     setup_requires=['pytest-runner'],
     tests_require=['pytest']

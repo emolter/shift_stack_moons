@@ -1,5 +1,4 @@
 [![DOI](https://zenodo.org/badge/415108491.svg)](https://zenodo.org/badge/latestdoi/415108491)
-
 [![codecov.io Code Coverage](https://codecov.io/gh/emolter/shift_stack_moons/branch/main/graph/badge.svg)](https://codecov.io/gh/emolter/shift_stack_moons)
 
 # Installation
