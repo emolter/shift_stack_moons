@@ -21,6 +21,18 @@ Programming Language :: Python :: 3.11
 Topic :: Software Development :: Libraries :: Python Modules
 """.splitlines())))
 
+install_requires = [
+    'numpy',
+    'matplotlib',
+    'pandas',
+    'scipy',
+    'astropy',
+    'astroquery',
+    'scikit-image',
+    'pyyaml',
+    'image_registration @ git+https://github.com/keflavich/image_registration.git',
+    ]
+
 setup(
     name="shift_stack_moons",
     version=VERSION,
@@ -38,5 +50,6 @@ setup(
     py_modules=['shift_stack_moons'],
     platforms=['any'],
     setup_requires=['pytest-runner'],
-    tests_require=['pytest']
+    tests_require=['pytest'],
+    install_requires=install_requires
 )

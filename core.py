@@ -15,32 +15,30 @@ import shift_stack_moons.data as header_info
 
 def chisq_stack(frames, showplot=False, edge_detect=True, **kwargs):
     """
-    Description
-    -----------
     Cross-correlate input images applying sub-pixel shift.
     Shift found using DFT upsampling method
-        as written by image_registration package
-    Stack them on top of each other to increase SNR.
+    as written by `image_registration <https://github.com/keflavich/image_registration>`_ package.
+    Then stack them on top of each other to increase SNR.
 
     Parameters
     ----------
-    frames: list, required.
+    :frames: list, required.
         list of 2-D image arrays.
-    showplot: bool, optional. default False.
+    :showplot: bool, optional. default False.
         if True, shows diagnostic plot for Canny edge detector
-    edge_detect: bool, optional. default True
+    :edge_detect: bool, optional. default True
         if True, applies the cross-correlation on image edges.
-            This can be advantageous for images of e.g. Neptune,
-            which has bright cloud features that may move
-            across the frame, so it's better to cross-correlate
-            on the edge of the planet's disk
+        This can be advantageous for images of e.g. Neptune,
+        which has bright cloud features that may move
+        across the frame, so it's better to cross-correlate
+        on the edge of the planet's disk
         if False, applies a simple cross-correlation to the image itself
-    kwargs:
-        see kwargs of skimage.feature.canny
+    :kwargs:
+        see kwargs of `skimage.feature.canny <https://scikit-image.org/docs/stable/api/skimage.feature.html#skimage.feature.canny>`_
 
     Returns
     -------
-    shifted_data: np.array
+    np.array, the shifted data
     """
     defaultKwargs = {'sigma': 5,
                      'low_thresh': 1e-1,
@@ -81,16 +79,14 @@ def chisq_stack(frames, showplot=False, edge_detect=True, **kwargs):
     return shifted_data
 
 
-def load_header_kw_dict(instrument):
+def _load_header_kw_dict(instrument):
     '''
-    Description
-    -----------
     Load dictionary that translates header keywords for a given telescope
     see kw_nirc2.yaml for an example
 
     Parameters
     ----------
-    instrument: str, required.
+    :instrument: str, required.
         telescope/instrument used. code will assume there exists a .yaml file
         named kw_instrument.yaml in the data/ subdirectory
     '''
@@ -112,53 +108,55 @@ def shift_and_stack(
         diagnostic_plots=False,
         **kwargs):
     """
-    Description
-    -----------
-    See Molter et al. (2023), doi:whatever Appendix whatever
-    Stack will be applied at the location of the zeroth image in fname_list
-
+    apply the shift-and-stack routine on a list of images
+    based on an input ephemeris
+            
     Parameters
     ----------
-    fname_list: list, required.
+    :fname_list: list, required.
         list of fits image filenames. image assumed to be in hdulist[0].data
         if not time-sorted, some header info might be incorrect
-    ephem: pd dataframe, required.
+    :ephem: Astropy Table, required.
         astroquery Horizons ephemeris. must contain at least quantity 6,
         the x,y position of the satellite relative to the planet
-    instrument: str, optional. default "nirc2"
+    :instrument: str, optional. default "nirc2"
         header keyword .yaml file to load.
         assumes filename kw_instrument.yaml
         see kw_nirc2.yaml for an example
-    difference: bool, optional. default False.
+    :difference: bool, optional. default False.
         Do you want to compute a median average,
         then difference each frame according to that median average?
-    edge_detect: bool, optional. default False.
+    :edge_detect: bool, optional. default False.
         If True, align the frames using a Canny
-            edge detection technique.
+        edge detection technique.
         If False, use a chi-square minimization of cross correlation
-    perturbation_mode: bool, optional. Default False.
+    :perturbation_mode: bool, optional. Default False.
         If True, add random x,y shifts on top of the
         true x,y shifts to show that this does NOT lead to a detection, i.e.,
         that the shift-and-stack technique doesnt introduce spurious detections
-    diagnostic_plots: bool, optional. Default False.
+    :diagnostic_plots: bool, optional. Default False.
         If True, shows median frame after image registration
         but before applying moon shift, and if edge_detect is also True,
         shows the edge detection solution
 
     Returns
     -------
-    fits_out: astropy.fits object
-        header copied from first input image, with the following exceptions:
-            ITIME: total integration time, computed as the sume of itime*coadds
+    astropy.fits object, output fits file.
+    header copied from first input image, with the exception of
+    *ITIME* = total integration time, computed as the sum of itime*coadds
 
     Notes
     -----
     Rotation Angle
-        The image is rotated counterclockwise according to:
-            angle_needed = -rotation_correction -
-                    (rotator_angle - instrument_angle)
-        This definition follows the convention for Keck NIRC2.
-            see https://github.com/jluastro/nirc2_distortion/wiki
+    ~~~~~~~~~~~~~~
+    The image is rotated counterclockwise according to
+    angle_needed = -rotation_correction - (rotator_angle - instrument_angle)
+    This definition follows the convention for Keck NIRC2.
+    see https://github.com/jluastro/nirc2_distortion/wiki
+        
+    References
+    ----------
+    See Molter et al. (2023), doi:whatever
     """
 
     # load the header keyword dictionary
