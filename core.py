@@ -160,7 +160,7 @@ def shift_and_stack(
     """
 
     # load the header keyword dictionary
-    kw_inst = load_header_kw_dict(instrument)
+    kw_inst = _load_header_kw_dict(instrument)
     pixscale = kw_inst['pixscale']
     rotation_correction = kw_inst['rotation_correction']
 
