@@ -79,7 +79,7 @@ def chisq_stack(frames, showplot=False, edge_detect=True, **kwargs):
     return shifted_data
 
 
-def _load_header_kw_dict(instrument):
+def load_header_kw_dict(instrument):
     '''
     Load dictionary that translates header keywords for a given telescope
     see kw_nirc2.yaml for an example
@@ -89,6 +89,11 @@ def _load_header_kw_dict(instrument):
     :instrument: str, required.
         telescope/instrument used. code will assume there exists a .yaml file
         named kw_instrument.yaml in the data/ subdirectory
+
+    Returns
+    -------
+    dict, translates between fits header keywords and variables needed
+    by shift_stack_moons
     '''
     fname = f'kw_{instrument}.yaml'
     with importlib.resources.open_binary(header_info, fname) as file:
@@ -110,7 +115,7 @@ def shift_and_stack(
     """
     apply the shift-and-stack routine on a list of images
     based on an input ephemeris
-            
+
     Parameters
     ----------
     :fname_list: list, required.
@@ -153,14 +158,14 @@ def shift_and_stack(
     angle_needed = -rotation_correction - (rotator_angle - instrument_angle)
     This definition follows the convention for Keck NIRC2.
     see https://github.com/jluastro/nirc2_distortion/wiki
-        
+
     References
     ----------
     See Molter et al. (2023), doi:whatever
     """
 
     # load the header keyword dictionary
-    kw_inst = _load_header_kw_dict(instrument)
+    kw_inst = load_header_kw_dict(instrument)
     pixscale = kw_inst['pixscale']
     rotation_correction = kw_inst['rotation_correction']
 
