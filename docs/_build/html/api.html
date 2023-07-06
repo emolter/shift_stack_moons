@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Python API &#8212; shift_stack_moons 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Citing this Software" href="citing.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="python-api">
+<h1>Python API<a class="headerlink" href="#python-api" title="Permalink to this heading">¶</a></h1>
+<section id="module-shift_stack_moons.shift_and_stack">
+<span id="shift-and-stack"></span><h2>shift_and_stack<a class="headerlink" href="#module-shift_stack_moons.shift_and_stack" title="Permalink to this heading">¶</a></h2>
+<p>apply the shift-and-stack routine on a list of images
+based on an input ephemeris</p>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading">¶</a></h3>
+<dl class="field-list simple">
+<dt class="field-odd">fname_list<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list, required.
+list of fits image filenames. image assumed to be in hdulist[0].data
+if not time-sorted, some header info might be incorrect</p>
+</dd>
+<dt class="field-even">ephem<span class="colon">:</span></dt>
+<dd class="field-even"><p>Astropy Table, required.
+astroquery Horizons ephemeris. must contain at least quantity 6,
+the x,y position of the satellite relative to the planet</p>
+</dd>
+<dt class="field-odd">instrument<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str, optional. default “nirc2”
+header keyword .yaml file to load.
+assumes filename kw_instrument.yaml
+see kw_nirc2.yaml for an example</p>
+</dd>
+<dt class="field-even">difference<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool, optional. default False.
+Do you want to compute a median average,
+then difference each frame according to that median average?</p>
+</dd>
+<dt class="field-odd">edge_detect<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool, optional. default False.
+If True, align the frames using a Canny
+edge detection technique.
+If False, use a chi-square minimization of cross correlation</p>
+</dd>
+<dt class="field-even">perturbation_mode<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool, optional. Default False.
+If True, add random x,y shifts on top of the
+true x,y shifts to show that this does NOT lead to a detection, i.e.,
+that the shift-and-stack technique doesnt introduce spurious detections</p>
+</dd>
+<dt class="field-odd">diagnostic_plots<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool, optional. Default False.
+If True, shows median frame after image registration
+but before applying moon shift, and if edge_detect is also True,
+shows the edge detection solution</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h3>Returns<a class="headerlink" href="#returns" title="Permalink to this heading">¶</a></h3>
+<p>astropy.fits object, output fits file.
+header copied from first input image, with the exception of
+<em>ITIME</em> = total integration time, computed as the sum of itime*coadds</p>
+</section>
+<section id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Permalink to this heading">¶</a></h3>
+<section id="rotation-angle">
+<h4>Rotation Angle<a class="headerlink" href="#rotation-angle" title="Permalink to this heading">¶</a></h4>
+<p>The image is rotated counterclockwise according to
+angle_needed = -rotation_correction - (rotator_angle - instrument_angle)
+This definition follows the convention for Keck NIRC2.
+see <a class="reference external" href="https://github.com/jluastro/nirc2_distortion/wiki">https://github.com/jluastro/nirc2_distortion/wiki</a></p>
+</section>
+</section>
+<section id="references">
+<h3>References<a class="headerlink" href="#references" title="Permalink to this heading">¶</a></h3>
+<p>See Molter et al. (2023), doi:whatever</p>
+</section>
+</section>
+<section id="module-shift_stack_moons.chisq_stack">
+<span id="chisq-stack"></span><h2>chisq_stack<a class="headerlink" href="#module-shift_stack_moons.chisq_stack" title="Permalink to this heading">¶</a></h2>
+<p>Cross-correlate input images applying sub-pixel shift.
+Shift found using DFT upsampling method
+as written by <a class="reference external" href="https://github.com/keflavich/image_registration">image_registration</a> package.
+Then stack them on top of each other to increase SNR.</p>
+<section id="id1">
+<h3>Parameters<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h3>
+<dl class="field-list simple">
+<dt class="field-odd">frames<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list, required.
+list of 2-D image arrays.</p>
+</dd>
+<dt class="field-even">showplot<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool, optional. default False.
+if True, shows diagnostic plot for Canny edge detector</p>
+</dd>
+<dt class="field-odd">edge_detect<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool, optional. default True
+if True, applies the cross-correlation on image edges.
+This can be advantageous for images of e.g. Neptune,
+which has bright cloud features that may move
+across the frame, so it’s better to cross-correlate
+on the edge of the planet’s disk
+if False, applies a simple cross-correlation to the image itself</p>
+</dd>
+<dt class="field-even">kwargs<span class="colon">:</span></dt>
+<dd class="field-even"><p>see kwargs of <a class="reference external" href="https://scikit-image.org/docs/stable/api/skimage.feature.html#skimage.feature.canny">skimage.feature.canny</a></p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h3>Returns<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
+<p>np.array, the shifted data</p>
+</section>
+</section>
+<section id="module-shift_stack_moons.load_header_kw_dict">
+<span id="load-header-kw-dict"></span><h2>load_header_kw_dict<a class="headerlink" href="#module-shift_stack_moons.load_header_kw_dict" title="Permalink to this heading">¶</a></h2>
+<p>Load dictionary that translates header keywords for a given telescope
+see kw_nirc2.yaml for an example</p>
+<section id="id3">
+<h3>Parameters<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h3>
+<dl class="field-list simple">
+<dt class="field-odd">instrument<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str, required.
+telescope/instrument used. code will assume there exists a .yaml file
+named kw_instrument.yaml in the data/ subdirectory</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h3>Returns<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
+<p>dict, translates between fits header keywords and variables needed
+by shift_stack_moons</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">shift_stack_moons</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citing.html">Citing this Software</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Python API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-shift_stack_moons.shift_and_stack">shift_and_stack</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-shift_stack_moons.chisq_stack">chisq_stack</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-shift_stack_moons.load_header_kw_dict">load_header_kw_dict</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="citing.html" title="previous chapter">Citing this Software</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Ned Molter.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/api.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

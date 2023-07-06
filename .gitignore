@@ -16,5 +16,4 @@ __pycache__
 /htmlcov
 /build
 /dist
-/docs
 .cache
