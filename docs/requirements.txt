@@ -1,7 +1,6 @@
 shift_stack_moons==0.1.0
 astropy==5.3
 astroquery==0.4.6
-image_registration==0.2.7.dev20+gb42a1af
 matplotlib==3.7.2
 numpy==1.25.0
 pandas==2.0.3
