@@ -11,6 +11,7 @@ Welcome to the shift_stack_moons documentation!
    :caption: Contents:
    
    quickstart
+   example-run
    citing
    api
 
