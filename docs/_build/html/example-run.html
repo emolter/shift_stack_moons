@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Basic Usage &#8212; shift_stack_moons 0.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    <link rel="stylesheet" type="text/css" href="_static/nbsphinx-code-cells.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Citing this Software" href="citing.html" />
+    <link rel="prev" title="Quickstart" href="quickstart.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="citing.html" title="Citing this Software"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="quickstart.html" title="Quickstart"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">shift_stack_moons 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Basic Usage</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="Basic-Usage">
+<h1>Basic Usage<a class="headerlink" href="#Basic-Usage" title="Permalink to this heading">¶</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">shift_stack_moons</span> <span class="kn">import</span> <span class="n">shift_and_stack</span>
+<span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span><span class="p">,</span> <span class="n">ascii</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">astroquery.jplhorizons</span> <span class="kn">import</span> <span class="n">Horizons</span>
+</pre></div>
+</div>
+</div>
+<p>First we need a list of time-sorted filenames. The shift-and-stack algorithm will run properly whether these are time-sorted or not, but if they are not, some header information in the output may be incorrect.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## find filenames</span>
+<span class="n">data_dir</span> <span class="o">=</span> <span class="s1">&#39;/Users/emolter/research/keck/observations/nirc2/reduced/2019nov04/&#39;</span>
+<span class="n">data_files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
+<span class="n">stem</span> <span class="o">=</span> <span class="s1">&#39;urh12&#39;</span> <span class="c1">#some subset of all the frames over the course of the night</span>
+<span class="n">fnames</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_dir</span><span class="o">+</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">data_files</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">stem</span><span class="p">)]</span>
+<span class="n">fnames</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">fnames</span><span class="p">)</span>
+<span class="c1">#print(fnames)</span>
+</pre></div>
+</div>
+</div>
+<p>Next, we need to get the satellite ephemeris from JPL Horizons. shift_stack_moons requires an Astropy table as input, which makes it easy to interface with astroquery.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## set up call to astroquery to retrieve satellite ephemeris</span>
+<span class="n">obscode</span> <span class="o">=</span> <span class="s1">&#39;568&#39;</span> <span class="c1">#Keck observatory code</span>
+<span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;Puck&#39;</span>
+<span class="n">date</span> <span class="o">=</span> <span class="s1">&#39;2019-11-04&#39;</span>
+<span class="n">tstart</span> <span class="o">=</span> <span class="n">date</span><span class="o">+</span><span class="s1">&#39; 00:00&#39;</span>
+<span class="n">tend</span> <span class="o">=</span> <span class="n">date</span><span class="o">+</span><span class="s1">&#39; 23:59&#39;</span>
+<span class="n">outfname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stem</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s2">.fits&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## get ephemeris from Horizons. quantity 6 is the satellite relative position to parent in arcsec</span>
+<span class="n">horizons_obj</span> <span class="o">=</span> <span class="n">Horizons</span><span class="p">(</span>
+    <span class="nb">id</span><span class="o">=</span><span class="n">code</span><span class="p">,</span>
+    <span class="n">location</span><span class="o">=</span><span class="n">obscode</span><span class="p">,</span>
+    <span class="n">epochs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="n">tstart</span><span class="p">,</span> <span class="s2">&quot;stop&quot;</span><span class="p">:</span> <span class="n">tend</span><span class="p">,</span> <span class="s2">&quot;step&quot;</span><span class="p">:</span> <span class="s2">&quot;1m&quot;</span><span class="p">},</span>
+<span class="p">)</span>
+<span class="n">ephem</span> <span class="o">=</span> <span class="n">horizons_obj</span><span class="o">.</span><span class="n">ephemerides</span><span class="p">(</span><span class="n">quantities</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span> <span class="c1">#.to_pandas()</span>
+</pre></div>
+</div>
+</div>
+<p>Now we will choose the options that are passed into shift_stack_moons. None of these is required; the default instrument (and the only one we’ve tested so far) is NIRC2.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## other inputs and flags to shift_stack_moons</span>
+<span class="n">instrument</span> <span class="o">=</span> <span class="s1">&#39;nirc2&#39;</span>
+<span class="n">difference</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">edge_detect</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">diagnostic_plots</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">perturbation_mode</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## run it</span>
+<span class="n">fits_out</span> <span class="o">=</span> <span class="n">shift_and_stack</span><span class="p">(</span><span class="n">fnames</span><span class="p">,</span>
+                           <span class="n">ephem</span><span class="p">,</span>
+                           <span class="n">instrument</span><span class="o">=</span><span class="n">instrument</span><span class="p">,</span>
+                           <span class="n">difference</span><span class="o">=</span><span class="n">difference</span><span class="p">,</span>
+                           <span class="n">edge_detect</span><span class="o">=</span><span class="n">edge_detect</span><span class="p">,</span>
+                           <span class="n">diagnostic_plots</span><span class="o">=</span><span class="n">diagnostic_plots</span><span class="p">,</span>
+                           <span class="n">perturbation_mode</span><span class="o">=</span><span class="n">perturbation_mode</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">fits_out</span><span class="p">))</span>
+<span class="c1">#fits_out.writeto(outfname, overwrite=True)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Processing file 1 out of 9
+Processing file 2 out of 9
+Processing file 3 out of 9
+Processing file 4 out of 9
+Processing file 5 out of 9
+Processing file 6 out of 9
+Processing file 7 out of 9
+Processing file 8 out of 9
+Processing file 9 out of 9
+&lt;class &#39;astropy.io.fits.hdu.hdulist.HDUList&#39;&gt;
+</pre></div></div>
+</div>
+<p>We can see that the output is an Astropy FITS object. If the fits_out.writeto() line is uncommented, the file urh12_Puck_2019-11-04.fits will be created.</p>
+<p>Finally, let’s check out the results. Note that useful metadata has been pre-computed and put into the header, including the total integration time.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Visualize the output</span>
+<span class="n">stacked_data</span> <span class="o">=</span> <span class="n">fits_out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+<span class="n">hdr</span> <span class="o">=</span> <span class="n">fits_out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Total integration time in stack: </span><span class="si">{</span><span class="n">hdr</span><span class="p">[</span><span class="s2">&quot;ITIME&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1"> seconds, which equals (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">fnames</span><span class="p">)</span><span class="si">}</span><span class="s1"> frames) * (120 seconds per frame)&#39;</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">stacked_data</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="n">stacked_data</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">/</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="s1">&#39;Puck&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Total integration time in stack: 1080.0 seconds, which equals (9 frames) * (120 seconds per frame)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/example-run_11_1.png" src="_images/example-run_11_1.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="quickstart.html"
+                          title="previous chapter">Quickstart</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="citing.html"
+                          title="next chapter">Citing this Software</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/example-run.ipynb.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="citing.html" title="Citing this Software"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="quickstart.html" title="Quickstart"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">shift_stack_moons 0.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Basic Usage</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2023, Ned Molter.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.0.1.
+    </div>
+  </body>
+</html>

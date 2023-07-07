@@ -3,14 +3,15 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to the shift_stack_moons documentation!
-===============================================
+shift_stack_moons docs
+======================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
    
-   quickstart
+   installation
+   description
    example-run
    citing
    api
