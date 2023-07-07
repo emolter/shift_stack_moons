@@ -1,8 +1,6 @@
 Installation
 ************
 
-Ensure Python version in your environment is >=3.7, then
-
-``pip install -r requirements.txt``
+Ensure Python version in your environment is >=3.7, then simply
 
 ``pip install shift-stack-moons``
