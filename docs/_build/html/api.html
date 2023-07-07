@@ -25,9 +25,6 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
           <a href="citing.html" title="Citing this Software"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">shift_stack_moons 0.1.0 documentation</a> &#187;</li>
@@ -42,9 +39,12 @@
             
   <section id="python-api">
 <h1>Python API<a class="headerlink" href="#python-api" title="Permalink to this heading">¶</a></h1>
-<section id="module-shift_stack_moons.shift_and_stack">
-<span id="shift-and-stack"></span><h2>shift_and_stack<a class="headerlink" href="#module-shift_stack_moons.shift_and_stack" title="Permalink to this heading">¶</a></h2>
-<p>apply the shift-and-stack routine on a list of images
+<section id="shift-and-stack">
+<h2>shift_and_stack<a class="headerlink" href="#shift-and-stack" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="shift_stack_moons.shift_and_stack">
+<span class="sig-prename descclassname"><span class="pre">shift_stack_moons.</span></span><span class="sig-name descname"><span class="pre">shift_and_stack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ephem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nirc2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">difference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_detect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perturbation_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diagnostic_plots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shift_stack_moons.shift_and_stack" title="Permalink to this definition">¶</a></dt>
+<dd><p>apply the shift-and-stack routine on a list of images
 based on an input ephemeris</p>
 <section id="parameters">
 <h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading">¶</a></h3>
@@ -110,10 +110,15 @@ see <a class="reference external" href="https://github.com/jluastro/nirc2_distor
 <h3>References<a class="headerlink" href="#references" title="Permalink to this heading">¶</a></h3>
 <p>See Molter et al. (2023), doi:whatever</p>
 </section>
+</dd></dl>
+
 </section>
-<section id="module-shift_stack_moons.chisq_stack">
-<span id="chisq-stack"></span><h2>chisq_stack<a class="headerlink" href="#module-shift_stack_moons.chisq_stack" title="Permalink to this heading">¶</a></h2>
-<p>Cross-correlate input images applying sub-pixel shift.
+<section id="chisq-stack">
+<h2>chisq_stack<a class="headerlink" href="#chisq-stack" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="shift_stack_moons.chisq_stack">
+<span class="sig-prename descclassname"><span class="pre">shift_stack_moons.</span></span><span class="sig-name descname"><span class="pre">chisq_stack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">showplot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_detect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#shift_stack_moons.chisq_stack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cross-correlate input images applying sub-pixel shift.
 Shift found using DFT upsampling method
 as written by <a class="reference external" href="https://github.com/keflavich/image_registration">image_registration</a> package.
 Then stack them on top of each other to increase SNR.</p>
@@ -146,10 +151,15 @@ if False, applies a simple cross-correlation to the image itself</p>
 <h3>Returns<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
 <p>np.array, the shifted data</p>
 </section>
+</dd></dl>
+
 </section>
-<section id="module-shift_stack_moons.load_header_kw_dict">
-<span id="load-header-kw-dict"></span><h2>load_header_kw_dict<a class="headerlink" href="#module-shift_stack_moons.load_header_kw_dict" title="Permalink to this heading">¶</a></h2>
-<p>Load dictionary that translates header keywords for a given telescope
+<section id="load-header-kw-dict">
+<h2>load_header_kw_dict<a class="headerlink" href="#load-header-kw-dict" title="Permalink to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="shift_stack_moons.load_header_kw_dict">
+<span class="sig-prename descclassname"><span class="pre">shift_stack_moons.</span></span><span class="sig-name descname"><span class="pre">load_header_kw_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#shift_stack_moons.load_header_kw_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load dictionary that translates header keywords for a given telescope
 see kw_nirc2.yaml for an example</p>
 <section id="id3">
 <h3>Parameters<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h3>
@@ -166,6 +176,8 @@ named kw_instrument.yaml in the data/ subdirectory</p>
 <p>dict, translates between fits header keywords and variables needed
 by shift_stack_moons</p>
 </section>
+</dd></dl>
+
 </section>
 </section>
 
@@ -180,24 +192,16 @@ by shift_stack_moons</p>
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">Python API</a><ul>
-<li><a class="reference internal" href="#module-shift_stack_moons.shift_and_stack">shift_and_stack</a><ul>
-<li><a class="reference internal" href="#parameters">Parameters</a></li>
-<li><a class="reference internal" href="#returns">Returns</a></li>
-<li><a class="reference internal" href="#notes">Notes</a><ul>
-<li><a class="reference internal" href="#rotation-angle">Rotation Angle</a></li>
+<li><a class="reference internal" href="#shift-and-stack">shift_and_stack</a><ul>
+<li><a class="reference internal" href="#shift_stack_moons.shift_and_stack"><code class="docutils literal notranslate"><span class="pre">shift_and_stack()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#references">References</a></li>
+<li><a class="reference internal" href="#chisq-stack">chisq_stack</a><ul>
+<li><a class="reference internal" href="#shift_stack_moons.chisq_stack"><code class="docutils literal notranslate"><span class="pre">chisq_stack()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-shift_stack_moons.chisq_stack">chisq_stack</a><ul>
-<li><a class="reference internal" href="#id1">Parameters</a></li>
-<li><a class="reference internal" href="#id2">Returns</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-shift_stack_moons.load_header_kw_dict">load_header_kw_dict</a><ul>
-<li><a class="reference internal" href="#id3">Parameters</a></li>
-<li><a class="reference internal" href="#id4">Returns</a></li>
+<li><a class="reference internal" href="#load-header-kw-dict">load_header_kw_dict</a><ul>
+<li><a class="reference internal" href="#shift_stack_moons.load_header_kw_dict"><code class="docutils literal notranslate"><span class="pre">load_header_kw_dict()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -237,9 +241,6 @@ by shift_stack_moons</p>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
         <li class="right" >
           <a href="citing.html" title="Citing this Software"
              >previous</a> |</li>
