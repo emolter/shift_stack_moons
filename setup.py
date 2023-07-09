@@ -31,6 +31,8 @@ install_requires = [
     'scikit-image',
     'pyyaml',
     'image_registration @ git+https://github.com/keflavich/image_registration.git',
+    'sphinx',
+    'nbsphinx',
     ]
 
 setup(
