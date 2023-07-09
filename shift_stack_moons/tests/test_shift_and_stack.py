@@ -8,7 +8,7 @@ import numpy as np
 @fixture
 def datadir(request, tmpdir):
     rootdir = request.config.rootdir
-    path = os.path.join(rootdir, 'tests', 'data')
+    path = os.path.join(rootdir, 'shift_stack_moons', 'tests', 'data')
     return path
 
 
