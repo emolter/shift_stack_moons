@@ -33,6 +33,7 @@ install_requires = [
     'image_registration @ git+https://github.com/keflavich/image_registration.git',
     'sphinx',
     'nbsphinx',
+    'pytest',
     ]
 
 setup(
