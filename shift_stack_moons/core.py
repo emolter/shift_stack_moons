@@ -226,9 +226,6 @@ def shift_and_stack(
         # do the differencing if difference=True
         if difference:
             frame = frame - median_frame
-            
-        plt.imshow(frame, origin='lower', vmin=-1, vmax=1)
-        plt.show()
         
         # rotate frame to posang 0, in case was rotated before
         # rotation correction is defined clockwise, but ndimage.rotate rotates
@@ -237,8 +234,6 @@ def shift_and_stack(
             (float(hdr[kw_inst["rotator_angle"]]) -
                 float(hdr[kw_inst["instrument_angle"]]))
         frame = ndimage.rotate(frame, angle_needed)
-        plt.imshow(frame, origin='lower', vmin=-1, vmax=1)
-        plt.show()
 
         # match ephemeris time with midpoint time in fits header
         obsdate = hdr[kw_inst["obsdate"]].strip(", \n")
