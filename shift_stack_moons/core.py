@@ -45,14 +45,14 @@ def chisq_stack(frames, showplot=False, edge_detect=True, **kwargs):
                      'high_thresh': 1e1}
     kwargs = {**defaultKwargs, **kwargs}
 
-    shifted_data = [frames[0]]
+    shifted_data = []
     if edge_detect:
         edges0 = feature.canny(
             frames[0],
             sigma=kwargs['sigma'],
             low_threshold=kwargs['low_thresh'],
             high_threshold=kwargs['high_thresh'])
-    for i, frame in enumerate(frames[1:]):
+    for i, frame in enumerate(frames):
         if not edge_detect:
             # simple max of convolution shift
             [dx, dy, dxerr, dyerr] = chi2_shift(frames[0], frame)
@@ -171,17 +171,24 @@ def shift_and_stack(
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        frames = [fits.open(fname, ignore_missing_end=True)[
-            0].data for fname in fname_list]
+        # attempt to figure out if image data is in hdul[0] like for Keck,
+        # or in hdul[1] like for HST/JWST
+        test_hdul = fits.open(fname_list[0], ignore_missing_end=True)
+        if len(test_hdul) == 1:
+            idx = 0
+        elif len(test_hdul) > 1:
+            idx = 1
+        frames = [fits.open(fname, ignore_missing_end=True)[idx].data for fname in fname_list]
         frames_centered = chisq_stack(
             frames,
             edge_detect=edge_detect,
             showplot=diagnostic_plots,
             **kwargs)
 
-    median_frame = np.median(frames_centered, axis=0)
+    median_frame = np.nanmedian(frames_centered, axis=0)
     if diagnostic_plots:
         plt.imshow(median_frame, origin='lower')
+        plt.title('Median frame')
         plt.show()
 
     # plt.plot(x_shifts, y_shifts, linestyle = '', marker = '.')
@@ -200,13 +207,6 @@ def shift_and_stack(
     x_interp = interpolate.interp1d(dt, x_shifts)
     y_interp = interpolate.interp1d(dt, y_shifts)
 
-    if diagnostic_plots:
-        plt.plot(x_shifts, y_shifts)
-        plt.xlabel('X position')
-        plt.ylabel('Y position')
-        plt.title('Object track, sky N up')
-        plt.show()
-
     # loop through all the input images and perform shift and stack
     shifted_images = []
     shifted_x = []
@@ -217,12 +217,19 @@ def shift_and_stack(
         print("Processing file %i out of %i" % (i + 1, len(frames_centered)))
         filename = fname_list[i]
         frame = frames_centered[i]
-        hdr = fits.open(filename, ignore_missing_end=True)[0].header
+        
+        # concatenate headers in multiple hdus into one
+        hdr = {}
+        for j in range(idx+1):
+            hdr.update(fits.open(filename, ignore_missing_end=True)[j].header)
 
         # do the differencing if difference=True
         if difference:
             frame = frame - median_frame
-
+            
+        plt.imshow(frame, origin='lower', vmin=-1, vmax=1)
+        plt.show()
+        
         # rotate frame to posang 0, in case was rotated before
         # rotation correction is defined clockwise, but ndimage.rotate rotates
         # ccw
@@ -230,11 +237,13 @@ def shift_and_stack(
             (float(hdr[kw_inst["rotator_angle"]]) -
                 float(hdr[kw_inst["instrument_angle"]]))
         frame = ndimage.rotate(frame, angle_needed)
+        plt.imshow(frame, origin='lower', vmin=-1, vmax=1)
+        plt.show()
 
         # match ephemeris time with midpoint time in fits header
         obsdate = hdr[kw_inst["obsdate"]].strip(", \n")
         start_time = obsdate + " " + \
-            hdr[kw_inst["start_time"]][:8]  # accuracy seconds
+            hdr[kw_inst["start_time"]].split('T')[-1][:8]  # accuracy seconds
         start_nseconds = (
             pd.to_datetime(
                 start_time,
@@ -275,6 +284,17 @@ def shift_and_stack(
         itime = hdr[kw_inst["itime"]] * hdr[kw_inst["coadds"]]
         total_itime_seconds += itime
 
+    if diagnostic_plots:
+        plt.plot(x_shifts, y_shifts)
+        plt.scatter(-(np.array(shifted_x)+dx0)*pixscale, 
+                    -(np.array(shifted_y)+dy0)*pixscale, 
+                    color='k', 
+                    marker='o')
+        plt.xlabel('X position (arcsec)')
+        plt.ylabel('Y position (arcsec)')
+        plt.title('Object track, sky N up')
+        plt.show()
+        
     shifted_images = np.asarray(shifted_images)
     stacked_image = np.sum(shifted_images, axis=0)
 

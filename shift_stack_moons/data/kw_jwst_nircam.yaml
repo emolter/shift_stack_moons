@@ -1,0 +1,11 @@
+pixscale: 0.031
+rotation_correction: 0.0
+obsdate: "DATE-OBS"
+start_time: "DATE-BEG"
+rotator_angle: "PA_V3"
+instrument_angle: "PCOUNT"
+itime: "XPOSURE"
+coadds: "GCOUNT"
+naxis1: "NAXIS1"
+naxis2: "NAXIS2"
+end_time: "DATE-END"
