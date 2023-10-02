@@ -36,4 +36,4 @@ The other dependencies should be included with a usual Python Anaconda install.
 I welcome contributions! Please submit an issue first, explaining what you'd like to change/add.  I'll comment on that, and then you can submit a PR when your improvement/addition is ready!
 
 # Cite
-If you use this for research, please cite it using the DOI above. Please also cite Molter et al. (2023), in press
+If you use this for research, please cite it using the DOI above. Please also cite [Molter et al. (2023)](https://doi.org/10.1016/j.icarus.2023.115697), Keck Near-Infrared Detections of Mab and Perdita, Icarus 405, 115697
